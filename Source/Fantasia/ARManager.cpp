@@ -14,7 +14,6 @@ AARManager::AARManager()
 void AARManager::BeginPlay()
 {
 	Super::BeginPlay();
-	UARBlueprintLibrary::StartARSession(ARSession);
 }
 
 // Called every frame
@@ -34,4 +33,6 @@ void AARManager::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+
 
