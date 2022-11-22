@@ -22,6 +22,6 @@ public:
 	UFUNCTION()
 	void StartSession();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ARManager")
-		TSubclassOf<AARManager> Manager;
+	TSubclassOf<AARManager> Manager;
 	
 };
