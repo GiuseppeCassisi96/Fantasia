@@ -64,7 +64,7 @@ void AARManager::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, 
 		this, &AARManager::JumpAction);
 	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, 
-		this, &AARManager::JumpAction);
+		this, &AARManager::StopJumpAction);
 
 }
 
