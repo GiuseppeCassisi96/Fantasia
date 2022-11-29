@@ -3,8 +3,10 @@
 
 #include "ARManager.h"
 
-#include "Components/InputComponent.h"
 
+#include "EngineUtils.h"
+#include "Components/InputComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 
 
 // Sets default values
@@ -13,9 +15,7 @@ AARManager::AARManager()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-
 	RootComponent = CameraComponent;
-	
 	
 }
 
@@ -37,12 +37,11 @@ void AARManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if(!bScanIsComplete)
 	{
-		
-		 Results = UARBlueprintLibrary::LineTraceTrackedObjects(ScreenSize,
-			false,false, true, true);
+
+		Results = UARBlueprintLibrary::GetAllGeometries();
 		 if(Results.Num() > 0)
 		 {
-			 ARCorePlane = static_cast<UARPlaneGeometry*>(Results[0].GetTrackedGeometry());
+			 ARCorePlane = Results[0];
 			 planeTr = ARCorePlane->GetLocalToWorldTransform();
 			 bScanIsComplete = true;
 		 }
@@ -60,6 +59,12 @@ void AARManager::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AARManager::InputTouch);
+	PlayerInputComponent->BindAxis("Horizontal", this, &AARManager::RightMovement);
+	PlayerInputComponent->BindAxis("Vertical", this, &AARManager::ForwardMovement);
+	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Pressed, 
+		this, &AARManager::JumpAction);
+	PlayerInputComponent->BindAction("Jump", EInputEvent::IE_Released, 
+		this, &AARManager::JumpAction);
 
 }
 
@@ -67,11 +72,38 @@ void AARManager::InputTouch(ETouchIndex::Type fingerIndex, FVector location)
 {
 	if(ARCorePlane != nullptr && !bIsSpawned)
 	{
-		AARLevel* realCurrentLevel = static_cast<AARLevel*>(currentLevel.GetDefaultObject());
+
 		GetWorld()->SpawnActor(currentLevel,&planeTr);
 		bIsSpawned = true;
+		sHero = static_cast<AARHero*>(UGameplayStatics::GetActorOfClass(this, hero));
 	}
 		
+}
+
+
+//Manage Hero movements
+void AARManager::ForwardMovement(float inputValue)
+{
+	if(sHero != nullptr)
+		sHero->ForwardMovement(inputValue, GetTransform().GetUnitAxis(EAxis::Type::X));
+}
+
+void AARManager::RightMovement(float inputValue)
+{
+	if (sHero != nullptr)
+		sHero->RightMovement(inputValue, GetTransform().GetUnitAxis(EAxis::Type::Y));
+}
+
+void AARManager::JumpAction()
+{
+	if (sHero != nullptr)
+		sHero->JumpAction();
+}
+
+void AARManager::StopJumpAction()
+{
+	if (sHero != nullptr)
+		sHero->StopJumpAction();
 }
 
 

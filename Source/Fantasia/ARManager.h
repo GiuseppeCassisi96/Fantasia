@@ -6,6 +6,7 @@
 #include "AugmentedReality/Public/ARBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "ARLevel.h"
+#include "ARHero.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Pawn.h"
@@ -21,27 +22,36 @@ public:
 	AARManager();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="ARSessionData")
 	UARSessionConfig* ARSession;
-	UPROPERTY(EditDefaultsOnly,Category="CurrentLevel")
+	UPROPERTY(EditAnywhere,Category="CurrentLevel")
 	TSubclassOf<APawn> currentLevel;
 	UPROPERTY(EditDefaultsOnly, Category="Camera")
 	UCameraComponent* CameraComponent;
+	UPROPERTY(EditAnywhere, Category = "Hero")
+	TSubclassOf<AARHero> hero;
+	UPROPERTY()
+	AARHero* sHero;
+	TArray<AActor*> Heroes;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	UPROPERTY()
-	UARPlaneGeometry* ARCorePlane;
+	UARTrackedGeometry* ARCorePlane;
 	bool bScanIsComplete;
 	bool bIsTracked;
 	bool bIsSpawned;
 	FTransform planeTr;
 	FVector2D ScreenSize;
-	TArray<FARTraceResult> Results;
+	TArray<UARTrackedGeometry*> Results;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void InputTouch(ETouchIndex::Type fingerIndex, FVector location);
+	void ForwardMovement(float inputValue);
+	void RightMovement(float inputValue);
+	void JumpAction();
+	void StopJumpAction();
 
 };

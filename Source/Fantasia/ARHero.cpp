@@ -3,6 +3,11 @@
 
 #include "ARHero.h"
 
+#include "Components/CapsuleComponent.h"
+#include "Components/InputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
+
 // Sets default values
 AARHero::AARHero()
 {
@@ -16,13 +21,13 @@ void AARHero::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	
 }
 
 // Called every frame
 void AARHero::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AddActorLocalRotation(FRotator(0.0f, 1.0f, 0.0f));
 }
 
 // Called to bind functionality to input
@@ -31,4 +36,29 @@ void AARHero::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
+
+void AARHero::ForwardMovement(float inputValue, FVector ARCameraFowardAxe)
+{
+	GetMovementComponent()->AddInputVector(ARCameraFowardAxe * inputValue
+		* Speed * GetWorld()->GetDeltaSeconds());
+}
+
+void AARHero::RightMovement(float inputValue, FVector ARCameraRightAxe)
+{
+	GetMovementComponent()->AddInputVector(ARCameraRightAxe * inputValue
+		* Speed * GetWorld()->GetDeltaSeconds());
+}
+
+void AARHero::JumpAction()
+{
+	Jump();
+}
+
+void AARHero::StopJumpAction()
+{
+	StopJumping();
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan,
+		TEXT("STOP"));
+}
+
 
